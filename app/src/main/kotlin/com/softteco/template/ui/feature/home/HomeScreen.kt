@@ -22,11 +22,13 @@ fun HomeScreen(
     viewModel: HomeViewModel = hiltViewModel(),
     onApiSampleClicked: () -> Unit = {},
     onGoLoginClicked: () -> Unit = {},
+    onBluetoothClicked: () -> Unit = {}
 ) {
     ScreenContent(
         state = viewModel.state.collectAsState().value,
         onApiSampleClicked = { onApiSampleClicked() },
-        onGoLoggingClicked = { onGoLoginClicked() }
+        onGoLoggingClicked = { onGoLoginClicked() },
+        onBluetoothClicked = { onBluetoothClicked() }
     )
 }
 
@@ -35,7 +37,8 @@ private fun ScreenContent(
     state: HomeViewModel.State,
     modifier: Modifier = Modifier,
     onApiSampleClicked: () -> Unit = {},
-    onGoLoggingClicked: () -> Unit = {}
+    onGoLoggingClicked: () -> Unit = {},
+    onBluetoothClicked: () -> Unit = {}
 ) {
     Box(modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
         Column(verticalArrangement = Arrangement.spacedBy(Dimens.PaddingSmall)) {
@@ -45,6 +48,9 @@ private fun ScreenContent(
             }
             Button(onClick = onGoLoggingClicked) {
                 Text(stringResource(id = R.string.go_to_login))
+            }
+            Button(onClick = onBluetoothClicked) {
+                Text(stringResource(id = R.string.go_to_bluetooth))
             }
         }
     }

@@ -11,6 +11,7 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.navigation
 import com.softteco.template.ui.feature.apisample.ApiSampleScreen
+import com.softteco.template.ui.feature.bluetooth.BluetoothScreen
 import com.softteco.template.ui.feature.home.HomeScreen
 import com.softteco.template.ui.feature.login.LoginScreen
 import com.softteco.template.ui.feature.profile.ProfileScreen
@@ -45,7 +46,8 @@ fun NavGraphBuilder.bottomBarGraph(navController: NavController) {
         composable(Screen.Home.route) {
             HomeScreen(
                 onApiSampleClicked = { navController.navigate(Screen.ApiSample.route) },
-                onGoLoginClicked = { navController.navigate(Screen.Login.route) }
+                onGoLoginClicked = { navController.navigate(Screen.Login.route) },
+                onBluetoothClicked = { navController.navigate(Screen.Bluetooth.route) }
             )
         }
         composable(Screen.Profile.route) {
@@ -61,6 +63,11 @@ fun NavGraphBuilder.bottomBarGraph(navController: NavController) {
                 onBackClicked = { navController.navigateUp() },
                 onLoginClicked = {},
                 onSignUpClicked = { navController.navigate(Screen.SignUp.route) }
+            )
+        }
+        composable(Screen.Bluetooth.route) {
+            BluetoothScreen(
+                onBackClicked = { navController.navigateUp() }
             )
         }
         composable(Screen.SignUp.route) {
