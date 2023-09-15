@@ -39,17 +39,9 @@ fun BluetoothScreen(
 ) {
     val state by viewModel.state.collectAsState()
 
-    //Mock data
-    val bluetoothDevices = mutableListOf(
-        BluetoothDevice("first", "00:00:00:00:01", 1),
-        BluetoothDevice("second", "00:00:00:00:02", 2),
-        BluetoothDevice("third", "00:00:00:00:03", 3)
-    )
-
     ScreenContent(
         state,
         modifier,
-        bluetoothDevices,
         onBackClicked
     )
 }
@@ -58,7 +50,6 @@ fun BluetoothScreen(
 private fun ScreenContent(
     state: BluetoothViewModel.State,
     modifier: Modifier = Modifier,
-    bluetoothDevices: MutableList<BluetoothDevice>,
     onBackClicked: () -> Unit = {}
 ) {
     TextSnackbarContainer(
@@ -74,7 +65,7 @@ private fun ScreenContent(
                 modifier = Modifier.fillMaxWidth(),
                 onBackClicked = onBackClicked
             )
-            BluetoothDevicesList(bluetoothDevices)
+            BluetoothDevicesList(state.bluetoothDevices)
         }
     }
 }
@@ -104,9 +95,7 @@ fun BluetoothDeviceCard(name: String, macAddress: String, rssi: Int) {
             .wrapContentHeight(),
         shape = MaterialTheme.shapes.medium
     ) {
-        Row(
-            verticalAlignment = Alignment.CenterVertically
-        ) {
+        Row(verticalAlignment = Alignment.CenterVertically) {
             Image(
                 painter = painterResource(R.drawable.ic_bluetooth),
                 contentDescription = null,
@@ -116,15 +105,9 @@ fun BluetoothDeviceCard(name: String, macAddress: String, rssi: Int) {
                 contentScale = ContentScale.Fit
             )
             Column(Modifier.padding(8.dp)) {
-                Text(
-                    text = name
-                )
-                Text(
-                    text = macAddress
-                )
-                Row(
-                    verticalAlignment = Alignment.CenterVertically,
-                ) {
+                Text(text = name)
+                Text(text = macAddress)
+                Row(verticalAlignment = Alignment.CenterVertically,) {
                     Image(
                         painter = painterResource(R.drawable.ic_signal_level),
                         contentDescription = null,
@@ -133,9 +116,7 @@ fun BluetoothDeviceCard(name: String, macAddress: String, rssi: Int) {
                             .padding(2.dp),
                         contentScale = ContentScale.Fit
                     )
-                    Text(
-                        text = rssi.toString()
-                    )
+                    Text(text = rssi.toString())
                 }
             }
             Column(
