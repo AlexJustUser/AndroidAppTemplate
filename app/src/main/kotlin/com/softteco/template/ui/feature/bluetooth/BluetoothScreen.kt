@@ -5,10 +5,9 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.fillMaxHeight
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
@@ -24,12 +23,13 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.softteco.template.R
-import com.softteco.template.data.bluetooth.BluetoothDevice
 import com.softteco.template.ui.components.CustomTopAppBar
 import com.softteco.template.ui.components.TextSnackbarContainer
+import com.softteco.template.ui.theme.Dimens.PaddingDefault
+import com.softteco.template.ui.theme.Dimens.PaddingExtraSmall
+import com.softteco.template.ui.theme.Dimens.PaddingSmall
 
 @Composable
 fun BluetoothScreen(
@@ -56,7 +56,7 @@ private fun ScreenContent(
         modifier = modifier,
         snackbarText = stringResource(state.snackBar.textId),
         showSnackbar = state.snackBar.show,
-        onDismissSnackbar = state.dismissSnackBar,
+        onDismissSnackbar = state.dismissSnackBar
     ) {
         Column(modifier = Modifier.fillMaxWidth()) {
             CustomTopAppBar(
@@ -65,18 +65,20 @@ private fun ScreenContent(
                 modifier = Modifier.fillMaxWidth(),
                 onBackClicked = onBackClicked
             )
-            BluetoothDevicesList(state.bluetoothDevices)
+            BluetoothDevicesList(state)
         }
     }
 }
 
 @Composable
-fun BluetoothDevicesList(bluetoothDevices: MutableList<BluetoothDevice>) {
+fun BluetoothDevicesList(
+    state: BluetoothViewModel.State
+) {
     LazyColumn(
         modifier = Modifier.fillMaxWidth(),
-        contentPadding = PaddingValues(16.dp)
+        contentPadding = PaddingValues(PaddingDefault)
     ) {
-        items(bluetoothDevices) { bluetoothDevice ->
+        items(state.bluetoothDevices) { bluetoothDevice ->
             BluetoothDeviceCard(
                 bluetoothDevice.name,
                 bluetoothDevice.macAddress,
@@ -87,10 +89,14 @@ fun BluetoothDevicesList(bluetoothDevices: MutableList<BluetoothDevice>) {
 }
 
 @Composable
-fun BluetoothDeviceCard(name: String, macAddress: String, rssi: Int) {
+fun BluetoothDeviceCard(
+    name: String,
+    macAddress: String,
+    rssi: Int
+) {
     Card(
         modifier = Modifier
-            .padding(10.dp)
+            .padding(PaddingDefault)
             .fillMaxWidth()
             .wrapContentHeight(),
         shape = MaterialTheme.shapes.medium
@@ -98,22 +104,20 @@ fun BluetoothDeviceCard(name: String, macAddress: String, rssi: Int) {
         Row(verticalAlignment = Alignment.CenterVertically) {
             Image(
                 painter = painterResource(R.drawable.ic_bluetooth),
-                contentDescription = null,
+                contentDescription = "ic_bluetooth",
                 modifier = Modifier
-                    .size(60.dp)
-                    .padding(8.dp),
+                    .padding(PaddingSmall),
                 contentScale = ContentScale.Fit
             )
-            Column(Modifier.padding(8.dp)) {
+            Column(Modifier.padding(PaddingSmall)) {
                 Text(text = name)
                 Text(text = macAddress)
-                Row(verticalAlignment = Alignment.CenterVertically,) {
+                Row(verticalAlignment = Alignment.CenterVertically) {
                     Image(
                         painter = painterResource(R.drawable.ic_signal_level),
-                        contentDescription = null,
+                        contentDescription = "ic_bluetooth",
                         modifier = Modifier
-                            .size(20.dp)
-                            .padding(2.dp),
+                            .padding(PaddingExtraSmall),
                         contentScale = ContentScale.Fit
                     )
                     Text(text = rssi.toString())
@@ -121,9 +125,8 @@ fun BluetoothDeviceCard(name: String, macAddress: String, rssi: Int) {
             }
             Column(
                 modifier = Modifier
-                    .fillMaxWidth()
-                    .fillMaxHeight()
-                    .padding(8.dp),
+                    .fillMaxSize()
+                    .padding(PaddingSmall),
                 verticalArrangement = Arrangement.Center,
                 horizontalAlignment = Alignment.End
             ) {
