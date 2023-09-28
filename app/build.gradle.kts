@@ -37,7 +37,24 @@ android {
     buildTypes {
 
         val envBaseUrl = "\"${System.getenv("BASE_URL")}\""
+        val envBluetoothServiceUUID = "\"${System.getenv("BLUETOOTH_SERVICE_UUID_VALUE")}\""
+        val envBluetoothCharacteristicUUID =
+            "\"${System.getenv("BLUETOOTH_CHARACTERISTIC_UUID_VALUE")}\""
+        val envBluetoothDescriptorUUID =
+            "\"${System.getenv("BLUETOOTH_DESCRIPTOR_UUID_VALUE")}\""
         val baseUrl = gradleLocalProperties(rootDir).getProperty("BASE_URL", envBaseUrl)
+        val bluetoothServiceUUID = gradleLocalProperties(rootDir).getProperty(
+            "BLUETOOTH_SERVICE_UUID_VALUE",
+            envBluetoothServiceUUID
+        )
+        val bluetoothCharacteristicUUID = gradleLocalProperties(rootDir).getProperty(
+            "BLUETOOTH_CHARACTERISTIC_UUID_VALUE",
+            envBluetoothCharacteristicUUID
+        )
+        val bluetoothDescriptorUUID = gradleLocalProperties(rootDir).getProperty(
+            "BLUETOOTH_DESCRIPTOR_UUID_VALUE",
+            envBluetoothDescriptorUUID
+        )
 
         release {
             isMinifyEnabled = false
@@ -47,10 +64,32 @@ android {
             )
             isDebuggable = false
             buildConfigField("String", "BASE_URL", baseUrl)
+            buildConfigField("String", "BLUETOOTH_SERVICE_UUID_VALUE", bluetoothServiceUUID)
+            buildConfigField(
+                "String",
+                "BLUETOOTH_CHARACTERISTIC_UUID_VALUE",
+                bluetoothCharacteristicUUID
+            )
+            buildConfigField(
+                "String",
+                "BLUETOOTH_DESCRIPTOR_UUID_VALUE",
+                bluetoothDescriptorUUID
+            )
         }
         debug {
             isDebuggable = true
             buildConfigField("String", "BASE_URL", baseUrl)
+            buildConfigField("String", "BLUETOOTH_SERVICE_UUID_VALUE", bluetoothServiceUUID)
+            buildConfigField(
+                "String",
+                "BLUETOOTH_CHARACTERISTIC_UUID_VALUE",
+                bluetoothCharacteristicUUID
+            )
+            buildConfigField(
+                "String",
+                "BLUETOOTH_DESCRIPTOR_UUID_VALUE",
+                bluetoothDescriptorUUID
+            )
         }
     }
     compileOptions {
@@ -109,6 +148,9 @@ dependencies {
     implementation(libs.androidx.room.runtime)
     ksp(libs.androidx.room.compiler)
     implementation(libs.androidx.room.ktx)
+
+    implementation(libs.nordicSemiBLE)
+    implementation(libs.nordicSemiScanner)
 
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.test.ext.junit)

@@ -1,5 +1,6 @@
 package com.softteco.template.ui.feature.bluetooth
 
+import android.annotation.SuppressLint
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -10,7 +11,6 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.items
 import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.MaterialTheme
@@ -21,78 +21,79 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.hilt.navigation.compose.hiltViewModel
+import com.softteco.template.MainActivity
 import com.softteco.template.R
 import com.softteco.template.ui.components.CustomTopAppBar
-import com.softteco.template.ui.components.TextSnackbarContainer
 import com.softteco.template.ui.theme.Dimens.PaddingDefault
-import com.softteco.template.ui.theme.Dimens.PaddingExtraSmall
 import com.softteco.template.ui.theme.Dimens.PaddingSmall
+import com.softteco.template.utils.BluetoothHelper
+import no.nordicsemi.android.support.v18.scanner.ScanResult
+
+private lateinit var bluetoothHelper: BluetoothHelper
+private var bluetoothDevices = hashMapOf<String, ScanResult>()
 
 @Composable
 fun BluetoothScreen(
-    modifier: Modifier = Modifier,
     viewModel: BluetoothViewModel = hiltViewModel(),
-    onBackClicked: () -> Unit = {}
+    onDetailsViewClicked: () -> Unit = {}
 ) {
     val state by viewModel.state.collectAsState()
 
-    ScreenContent(
-        state,
-        modifier,
-        onBackClicked
-    )
+    bluetoothHelper = BluetoothHelper(LocalContext.current as MainActivity, viewModel)
+    bluetoothHelper.initBluetooth()
+    bluetoothHelper.startScan()
+
+    ScreenContent(state, onDetailsViewClicked)
 }
 
 @Composable
 private fun ScreenContent(
     state: BluetoothViewModel.State,
-    modifier: Modifier = Modifier,
-    onBackClicked: () -> Unit = {}
+    onDetailsViewClicked: () -> Unit = {}
 ) {
-    TextSnackbarContainer(
-        modifier = modifier,
-        snackbarText = stringResource(state.snackBar.textId),
-        showSnackbar = state.snackBar.show,
-        onDismissSnackbar = state.dismissSnackBar
-    ) {
-        Column(modifier = Modifier.fillMaxWidth()) {
-            CustomTopAppBar(
-                stringResource(id = R.string.bluetooth),
-                showBackIcon = true,
-                modifier = Modifier.fillMaxWidth(),
-                onBackClicked = onBackClicked
-            )
-            BluetoothDevicesList(state)
-        }
+    Column(modifier = Modifier.fillMaxWidth()) {
+        CustomTopAppBar(
+            stringResource(id = R.string.bluetooth),
+            showBackIcon = false,
+            modifier = Modifier.fillMaxWidth()
+        )
+        BluetoothDevicesList(state, onDetailsViewClicked)
     }
 }
 
 @Composable
 fun BluetoothDevicesList(
-    state: BluetoothViewModel.State
+    state: BluetoothViewModel.State,
+    onDetailsViewClicked: () -> Unit = {}
 ) {
     LazyColumn(
         modifier = Modifier.fillMaxWidth(),
         contentPadding = PaddingValues(PaddingDefault)
     ) {
-        items(state.bluetoothDevices) { bluetoothDevice ->
-            BluetoothDeviceCard(
-                bluetoothDevice.name,
-                bluetoothDevice.macAddress,
-                bluetoothDevice.rssi
-            )
+        state.bluetoothDevice?.let {
+            bluetoothDevices[it.device.address] = it
+
+            bluetoothDevices.toList().asReversed().forEach {
+                item {
+                    BluetoothDeviceCard(
+                        it.second,
+                        onDetailsViewClicked
+                    )
+                }
+            }
         }
     }
 }
 
+@SuppressLint("MissingPermission")
 @Composable
 fun BluetoothDeviceCard(
-    name: String,
-    macAddress: String,
-    rssi: Int
+    scanResult: ScanResult,
+    onDetailsViewClicked: () -> Unit = {}
 ) {
     Card(
         modifier = Modifier
@@ -110,18 +111,8 @@ fun BluetoothDeviceCard(
                 contentScale = ContentScale.Fit
             )
             Column(Modifier.padding(PaddingSmall)) {
-                Text(text = name)
-                Text(text = macAddress)
-                Row(verticalAlignment = Alignment.CenterVertically) {
-                    Image(
-                        painter = painterResource(R.drawable.ic_signal_level),
-                        contentDescription = "ic_bluetooth",
-                        modifier = Modifier
-                            .padding(PaddingExtraSmall),
-                        contentScale = ContentScale.Fit
-                    )
-                    Text(text = rssi.toString())
-                }
+                Text(text = scanResult.device.name)
+                Text(text = scanResult.device.address)
             }
             Column(
                 modifier = Modifier
@@ -130,8 +121,10 @@ fun BluetoothDeviceCard(
                 verticalArrangement = Arrangement.Center,
                 horizontalAlignment = Alignment.End
             ) {
-                Button(onClick = {}) {
-                    Text(stringResource(id = R.string.connect))
+                Button(onClick = {
+                    bluetoothHelper.connectToBluetoothDevice(scanResult)
+                }) {
+                    Text(stringResource(id = R.string.view))
                 }
             }
         }

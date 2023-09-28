@@ -5,7 +5,6 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.navigation.compose.rememberNavController
-import com.softteco.template.navigation.AppBottomBar
 import com.softteco.template.navigation.AppNavHost
 import com.softteco.template.navigation.Graph
 
@@ -14,14 +13,11 @@ fun AppContent(modifier: Modifier = Modifier) {
     val navController = rememberNavController()
 
     Scaffold(
-        modifier = modifier.fillMaxSize(),
-        bottomBar = {
-            AppBottomBar(navController = navController)
-        }
+        modifier = modifier.fillMaxSize()
     ) { paddingValues ->
         AppNavHost(
             navController = navController,
-            startDestination = Graph.BottomBar.route,
+            startDestination = Graph.Bluetooth.route,
             paddingValues = paddingValues
         )
     }
