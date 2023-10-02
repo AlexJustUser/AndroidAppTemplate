@@ -152,6 +152,8 @@ dependencies {
     implementation(libs.nordicSemiBLE)
     implementation(libs.nordicSemiScanner)
 
+    implementation(libs.hellocharts)
+
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.test.ext.junit)
     androidTestImplementation(libs.androidx.test.espresso.core)

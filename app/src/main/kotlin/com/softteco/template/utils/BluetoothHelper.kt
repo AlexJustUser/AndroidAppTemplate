@@ -137,9 +137,17 @@ class BluetoothHelper(
             characteristic: BluetoothGattCharacteristic
         ) {
             characteristic.value.let {
-                val temp = characteristicByteConversation(characteristic.value, startIndexOfTemperature, endIndexOfTemperature) / divisionValueOfValues
+                val temp = characteristicByteConversation(
+                    characteristic.value,
+                    startIndexOfTemperature,
+                    endIndexOfTemperature
+                ) / divisionValueOfValues
                 val hum = characteristic.value[indexOfHumidity].toInt()
-                val bat = characteristicByteConversation(characteristic.value, startIndexOfBattery, endIndexOfBattery)
+                val bat = characteristicByteConversation(
+                    characteristic.value,
+                    startIndexOfBattery,
+                    endIndexOfBattery
+                )
                 println("temp:   $temp °C, hum:   $hum %, bat:   $bat mV")
             }
         }

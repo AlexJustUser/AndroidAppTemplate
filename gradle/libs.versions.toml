@@ -44,6 +44,7 @@ room = "2.5.2"
 composeMaterialDialog = "0.9.0"
 nordicSemiBLE = "2.6.1"
 nordicSemiScanner = "1.6.0"
+hellocharts = "v1.5.8"
 
 [libraries]
 androidx-core-ktx = { module = "androidx.core:core-ktx", version.ref = "ktx" }
@@ -74,6 +75,7 @@ androidx-room-compiler = { module = "androidx.room:room-compiler", version.ref =
 androidx-room-ktx = { module = "androidx.room:room-ktx", version.ref = "room" }
 nordicSemiBLE = { module = "no.nordicsemi.android:ble", version.ref = "nordicSemiBLE" }
 nordicSemiScanner = { module = "no.nordicsemi.android.support.v18:scanner", version.ref = "nordicSemiScanner" }
+hellocharts = { module = "com.github.lecho:hellocharts-android", version.ref = "hellocharts" }
 
 junit = { module = "junit:junit", version.ref = "junit" }
 androidx-test-ext-junit = { module = "androidx.test.ext:junit", version.ref = "testExtJunit" }
