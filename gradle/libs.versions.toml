@@ -44,7 +44,7 @@ room = "2.5.2"
 composeMaterialDialog = "0.9.0"
 nordicSemiBLE = "2.6.1"
 nordicSemiScanner = "1.6.0"
-hellocharts = "v1.5.8"
+hellocharts = "1.5.8"
 
 [libraries]
 androidx-core-ktx = { module = "androidx.core:core-ktx", version.ref = "ktx" }
