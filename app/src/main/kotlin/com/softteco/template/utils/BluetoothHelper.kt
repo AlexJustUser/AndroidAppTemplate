@@ -9,27 +9,28 @@ import android.bluetooth.BluetoothGattCharacteristic
 import android.bluetooth.BluetoothGattDescriptor
 import android.bluetooth.BluetoothManager
 import android.bluetooth.BluetoothProfile
+import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
 import android.location.LocationManager
 import android.provider.Settings
 import com.softteco.template.BuildConfig
 import com.softteco.template.MainActivity
-import com.softteco.template.ui.feature.bluetooth.BluetoothViewModel
+import com.softteco.template.model.DataLYWSD03MMC
 import no.nordicsemi.android.support.v18.scanner.BluetoothLeScannerCompat
 import no.nordicsemi.android.support.v18.scanner.ScanCallback
 import no.nordicsemi.android.support.v18.scanner.ScanResult
 import java.util.UUID
 
-class BluetoothHelper(
-    private val activity: MainActivity,
-    private val bluetoothViewModel: BluetoothViewModel
-) {
+class BluetoothHelper(private val activity: MainActivity) {
 
     private lateinit var bluetoothManager: BluetoothManager
     private lateinit var bluetoothAdapter: BluetoothAdapter
     private lateinit var locationManager: LocationManager
     private lateinit var bluetoothPermissionChecker: BluetoothPermissionChecker
+    var onConnect: (() -> Unit)? = null
+    var onScanResult: ((scanResult: ScanResult) -> Unit)? = null
+    var onDeviceResult: ((dataLYWSD03MMC: DataLYWSD03MMC) -> Unit)? = null
     private val startIndexOfTemperature = 0
     private val endIndexOfTemperature = 2
     private val indexOfHumidity = 2
@@ -45,13 +46,26 @@ class BluetoothHelper(
         ) {
             super.onScanResult(callbackType, scanResult)
             scanResult.device.name?.let {
-                bluetoothViewModel.addBluetoothDevice(scanResult)
+                onScanResult?.invoke(scanResult)
             }
         }
     }
 
     @SuppressLint("MissingPermission")
     fun initBluetooth() {
+        activity.bluetoothReceiver = object : BroadcastReceiver() {
+            override fun onReceive(context: Context, intent: Intent) {
+                when (intent.getIntExtra(BluetoothAdapter.EXTRA_STATE, BluetoothAdapter.STATE_OFF)) {
+                    BluetoothAdapter.STATE_ON -> {
+                        provideBluetoothOperation()
+                    }
+
+                    BluetoothAdapter.STATE_OFF -> {
+                        stopScan()
+                    }
+                }
+            }
+        }
         bluetoothManager =
             activity.getSystemService(Context.BLUETOOTH_SERVICE) as BluetoothManager
         bluetoothAdapter = bluetoothManager.adapter
@@ -61,11 +75,20 @@ class BluetoothHelper(
             BluetoothPermissionChecker(activity, bluetoothAdapter, locationManager)
     }
 
-    fun startScan() {
+    fun registerReceiver() {
+        activity.registerReceiver(activity.bluetoothReceiver, activity.broadcastFilter)
+    }
+
+    fun unregisterReceiver() {
+        activity.unregisterReceiver(activity.bluetoothReceiver)
+    }
+
+    private fun startScan() {
+        stopScan()
         BluetoothLeScannerCompat.getScanner().startScan(scanCallback)
     }
 
-    private fun stopScan() {
+    fun stopScan() {
         BluetoothLeScannerCompat.getScanner().stopScan(scanCallback)
     }
 
@@ -90,7 +113,9 @@ class BluetoothHelper(
     }
 
     private fun makeBluetoothOperation() {
-
+        if(bluetoothPermissionChecker.hasPermissions()) {
+            startScan()
+        }
     }
 
     private val mGattCallback: BluetoothGattCallback = object : BluetoothGattCallback() {
@@ -98,6 +123,7 @@ class BluetoothHelper(
         override fun onConnectionStateChange(gatt: BluetoothGatt, status: Int, newState: Int) {
             if (newState == BluetoothProfile.STATE_CONNECTED) {
                 gatt.discoverServices()
+                onConnect?.invoke()
             }
         }
 
@@ -148,7 +174,8 @@ class BluetoothHelper(
                     startIndexOfBattery,
                     endIndexOfBattery
                 )
-                println("temp:   $temp °C, hum:   $hum %, bat:   $bat mV")
+
+                onDeviceResult?.invoke(DataLYWSD03MMC(temp, hum, bat))
             }
         }
     }

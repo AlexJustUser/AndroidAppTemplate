@@ -11,4 +11,8 @@ object Constants {
     const val MIN_SIZE_OF_RANDOM_STRING = 1
     const val MAX_SIZE_OF_RANDOM_STRING = 10
     const val BLUETOOTH_DEFAULT_TRANSMIT_DELAY = 2000L
+    const val ALPHA_COLOR_VALUE = 255
+    const val BOUND_COLOR_VALUE = 256
+    const val CHARTS_STEP_VALUE = 1.0F
+    const val BLUETOOTH_MODULE = "bluetooth-module"
 }

@@ -4,6 +4,7 @@ import android.annotation.SuppressLint
 import androidx.compose.runtime.Immutable
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.softteco.template.model.DataLYWSD03MMC
 import com.softteco.template.ui.components.SnackBarState
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -46,12 +47,5 @@ class ChartViewModel @Inject constructor() : ViewModel() {
         val dataLYWSD03MMC: DataLYWSD03MMC = DataLYWSD03MMC(),
         val snackBar: SnackBarState = SnackBarState(),
         val dismissSnackBar: () -> Unit = {}
-    )
-
-    @Immutable
-    data class DataLYWSD03MMC(
-        val temperature: Double = 0.0,
-        val humidity: Int = 0,
-        val battery: Double = 0.0
     )
 }

@@ -1,4 +1,4 @@
-package com.softteco.template.ui.feature.bluetooth
+package com.softteco.template.ui.feature.bluetooth.sensor
 
 import android.annotation.SuppressLint
 import androidx.compose.runtime.Immutable
@@ -15,7 +15,7 @@ import no.nordicsemi.android.support.v18.scanner.ScanResult
 import javax.inject.Inject
 
 @HiltViewModel
-class BluetoothViewModel @Inject constructor() : ViewModel() {
+class BluetoothSensorViewModel @Inject constructor() : ViewModel() {
 
     private var snackBarState = MutableStateFlow(SnackBarState())
     private var bluetoothDevice = MutableStateFlow<ScanResult?>(null)

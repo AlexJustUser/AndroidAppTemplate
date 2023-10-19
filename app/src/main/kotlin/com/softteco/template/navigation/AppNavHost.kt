@@ -10,8 +10,8 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.navigation
-import com.softteco.template.ui.feature.bluetooth.BluetoothScreen
-import com.softteco.template.ui.feature.details.DetailsScreen
+import com.softteco.template.ui.feature.bluetooth.sensor.BluetoothScreen
+import com.softteco.template.ui.feature.chart.ChartScreen
 
 @Composable
 fun AppNavHost(
@@ -25,22 +25,23 @@ fun AppNavHost(
         startDestination = startDestination,
         modifier = modifier.padding(paddingValues = paddingValues)
     ) {
-        bottomBarGraph(navController)
+        bluetoothGraph(navController)
     }
 }
 
-fun NavGraphBuilder.bottomBarGraph(navController: NavController) {
+fun NavGraphBuilder.bluetoothGraph(navController: NavController) {
     navigation(
         startDestination = Screen.Bluetooth.route,
         route = Graph.Bluetooth.route
     ) {
         composable(Screen.Bluetooth.route) {
             BluetoothScreen(
-                onDetailsViewClicked = { navController.navigate(Screen.DetailsView.route) }
+                onConnect = {
+                    navController.navigate(Screen.Chart.route) }
             )
         }
-        composable(Screen.DetailsView.route) {
-            DetailsScreen(
+        composable(Screen.Chart.route) {
+            ChartScreen(
                 onBackClicked = { navController.navigateUp() }
             )
         }

@@ -1,4 +1,4 @@
-package com.softteco.template.ui.feature.bluetooth
+package com.softteco.template.ui.feature.bluetooth.sensor
 
 import android.annotation.SuppressLint
 import androidx.compose.foundation.Image
@@ -6,7 +6,6 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.wrapContentHeight
@@ -24,36 +23,42 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.softteco.template.MainActivity
 import com.softteco.template.R
 import com.softteco.template.ui.components.CustomTopAppBar
 import com.softteco.template.ui.theme.Dimens.PaddingDefault
 import com.softteco.template.ui.theme.Dimens.PaddingSmall
-import com.softteco.template.utils.BluetoothHelper
 import no.nordicsemi.android.support.v18.scanner.ScanResult
 
-private lateinit var bluetoothHelper: BluetoothHelper
 private var bluetoothDevices = hashMapOf<String, ScanResult>()
+private lateinit var activity: MainActivity
 
 @Composable
 fun BluetoothScreen(
-    viewModel: BluetoothViewModel = hiltViewModel(),
-    onDetailsViewClicked: () -> Unit = {}
+    viewModel: BluetoothSensorViewModel = hiltViewModel(),
+    onConnect: () -> Unit = {}
 ) {
     val state by viewModel.state.collectAsState()
+    activity = LocalContext.current as MainActivity
 
-    bluetoothHelper = BluetoothHelper(LocalContext.current as MainActivity, viewModel)
-    bluetoothHelper.initBluetooth()
-    bluetoothHelper.startScan()
+    activity.bluetoothHelper.onScanResult = {
+        viewModel.addBluetoothDevice(it)
+    }
 
-    ScreenContent(state, onDetailsViewClicked)
+    activity.bluetoothHelper.onConnect = {
+        activity.runOnUiThread {
+            onConnect.invoke()
+        }
+    }
+
+    ScreenContent(state)
 }
 
 @Composable
 private fun ScreenContent(
-    state: BluetoothViewModel.State,
-    onDetailsViewClicked: () -> Unit = {}
+    state: BluetoothSensorViewModel.State
 ) {
     Column(modifier = Modifier.fillMaxWidth()) {
         CustomTopAppBar(
@@ -61,14 +66,14 @@ private fun ScreenContent(
             showBackIcon = false,
             modifier = Modifier.fillMaxWidth()
         )
-        BluetoothDevicesList(state, onDetailsViewClicked)
+
+        BluetoothDevicesList(state)
     }
 }
 
 @Composable
 fun BluetoothDevicesList(
-    state: BluetoothViewModel.State,
-    onDetailsViewClicked: () -> Unit = {}
+    state: BluetoothSensorViewModel.State
 ) {
     LazyColumn(
         modifier = Modifier.fillMaxWidth(),
@@ -80,8 +85,7 @@ fun BluetoothDevicesList(
             bluetoothDevices.toList().asReversed().forEach {
                 item {
                     BluetoothDeviceCard(
-                        it.second,
-                        onDetailsViewClicked
+                        it.second
                     )
                 }
             }
@@ -92,8 +96,7 @@ fun BluetoothDevicesList(
 @SuppressLint("MissingPermission")
 @Composable
 fun BluetoothDeviceCard(
-    scanResult: ScanResult,
-    onDetailsViewClicked: () -> Unit = {}
+    scanResult: ScanResult
 ) {
     Card(
         modifier = Modifier
@@ -110,21 +113,38 @@ fun BluetoothDeviceCard(
                     .padding(PaddingSmall),
                 contentScale = ContentScale.Fit
             )
-            Column(Modifier.padding(PaddingSmall)) {
-                Text(text = scanResult.device.name)
-                Text(text = scanResult.device.address)
+            Column(
+                Modifier
+                    .weight(1F, true)
+                    .padding(PaddingSmall)
+            ) {
+                Text(
+                    text = scanResult.device.name,
+                    overflow = TextOverflow.Ellipsis,
+                    maxLines = 1
+                )
+                Text(
+                    text = scanResult.device.address,
+                    overflow = TextOverflow.Ellipsis,
+                    maxLines = 1
+                )
             }
             Column(
                 modifier = Modifier
-                    .fillMaxSize()
+                    .weight(0.5F, false)
+                    .fillMaxWidth()
                     .padding(PaddingSmall),
                 verticalArrangement = Arrangement.Center,
                 horizontalAlignment = Alignment.End
             ) {
-                Button(onClick = {
-                    bluetoothHelper.connectToBluetoothDevice(scanResult)
-                }) {
-                    Text(stringResource(id = R.string.view))
+                Button(
+                    onClick = {
+                        activity.bluetoothHelper.connectToBluetoothDevice(scanResult)
+                    }) {
+                    Text(
+                        stringResource(id = R.string.view),
+                        maxLines = 1
+                    )
                 }
             }
         }

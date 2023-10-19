@@ -26,4 +26,9 @@
     <string name="view">view</string>
     <string name="disconnect">disconnect</string>
     <string name="visibility">visibility</string>
+    <string name="temperature">Temperature:</string>
+    <string name="humidity">Humidity:</string>
+    <string name="battery">Battery:</string>
+    <string name="temperature_point_label">T</string>
+    <string name="humidity_point_label">H</string>
 </resources>
