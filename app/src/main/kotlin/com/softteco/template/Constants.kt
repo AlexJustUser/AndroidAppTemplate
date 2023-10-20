@@ -14,5 +14,4 @@ object Constants {
     const val ALPHA_COLOR_VALUE = 255
     const val BOUND_COLOR_VALUE = 256
     const val CHARTS_STEP_VALUE = 1.0F
-    const val BLUETOOTH_MODULE = "bluetooth-module"
 }

@@ -12,6 +12,7 @@ import android.bluetooth.BluetoothProfile
 import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
+import android.content.IntentFilter
 import android.location.LocationManager
 import android.provider.Settings
 import com.softteco.template.BuildConfig
@@ -55,7 +56,10 @@ class BluetoothHelper(private val activity: MainActivity) {
     fun initBluetooth() {
         activity.bluetoothReceiver = object : BroadcastReceiver() {
             override fun onReceive(context: Context, intent: Intent) {
-                when (intent.getIntExtra(BluetoothAdapter.EXTRA_STATE, BluetoothAdapter.STATE_OFF)) {
+                when (intent.getIntExtra(
+                    BluetoothAdapter.EXTRA_STATE,
+                    BluetoothAdapter.STATE_OFF
+                )) {
                     BluetoothAdapter.STATE_ON -> {
                         provideBluetoothOperation()
                     }
@@ -66,6 +70,7 @@ class BluetoothHelper(private val activity: MainActivity) {
                 }
             }
         }
+        registerReceiver()
         bluetoothManager =
             activity.getSystemService(Context.BLUETOOTH_SERVICE) as BluetoothManager
         bluetoothAdapter = bluetoothManager.adapter
@@ -75,8 +80,11 @@ class BluetoothHelper(private val activity: MainActivity) {
             BluetoothPermissionChecker(activity, bluetoothAdapter, locationManager)
     }
 
-    fun registerReceiver() {
-        activity.registerReceiver(activity.bluetoothReceiver, activity.broadcastFilter)
+    private fun registerReceiver() {
+        activity.registerReceiver(
+            activity.bluetoothReceiver,
+            IntentFilter(BluetoothAdapter.ACTION_STATE_CHANGED)
+        )
     }
 
     fun unregisterReceiver() {
@@ -113,7 +121,7 @@ class BluetoothHelper(private val activity: MainActivity) {
     }
 
     private fun makeBluetoothOperation() {
-        if(bluetoothPermissionChecker.hasPermissions()) {
+        if (bluetoothPermissionChecker.hasPermissions()) {
             startScan()
         }
     }
